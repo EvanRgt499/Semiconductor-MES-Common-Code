@@ -3,9 +3,9 @@
 
 ## 技术栈
 - 后端：C# / .NET Framework / ASP.NET
-- 客户端：C# WinForm（车间现场主要使用）
+- 客户端：C# WinForm
 - 数据库：Oracle
-- 业务：工单管理、SN过站、产品追溯、质量不良、BPM审批、APQP/DRS/BRB
+
 
 ## 主要功能
 1. 工单查询、状态维护、批量数据处理
