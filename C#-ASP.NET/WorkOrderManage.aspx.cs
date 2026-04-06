@@ -1,3 +1,8 @@
+// 半导体封装MES系统 - 工单管理Web页面
+// 作者：[孟斯辰]
+// 日期：2026-04-06
+// 说明：用于Web端工单管理和查询
+
 using System;
 using System.Data;
 using System.Web.UI.WebControls;
@@ -7,25 +12,40 @@ using OfficeOpenXml;
 
 namespace MES.Web
 {
+    /// <summary>
+    /// 工单管理页面
+    /// 用于半导体封装MES系统的Web端工单管理
+    /// </summary>
     public partial class WorkOrderManage : System.Web.UI.Page
     {
+        // 每页显示记录数
         private int pageSize = 20;
 
+        /// <summary>
+        /// 页面加载事件
+        /// </summary>
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
+                // 初始化当前页码
                 ViewState["CurrentPage"] = 1;
+                // 绑定工单列表
                 BindWorkOrderList("");
             }
         }
 
-        // 绑定工单列表
+        /// <summary>
+        /// 绑定工单列表
+        /// </summary>
+        /// <param name="workOrderNo">工单号查询条件</param>
         private void BindWorkOrderList(string workOrderNo)
         {
             try
             {
+                // 获取当前页码
                 int currentPage = Convert.ToInt32(ViewState["CurrentPage"]);
+                // 计算分页范围
                 int startRow = (currentPage - 1) * pageSize + 1;
                 int endRow = currentPage * pageSize;
 
@@ -61,6 +81,7 @@ namespace MES.Web
                 param[param.Length - 2] = new OracleParameter(":start_row", startRow);
                 param[param.Length - 1] = new OracleParameter(":end_row", endRow);
 
+                // 查询数据
                 DataTable dt = OracleHelper.Query(sql, param);
                 gvWorkOrder.DataSource = dt;
                 gvWorkOrder.DataBind();
@@ -78,6 +99,11 @@ namespace MES.Web
             }
         }
 
+        /// <summary>
+        /// 获取SQL参数
+        /// </summary>
+        /// <param name="workOrderNo">工单号</param>
+        /// <returns>Oracle参数数组</returns>
         private OracleParameter[] GetParameters(string workOrderNo)
         {
             var parameters = new System.Collections.Generic.List<OracleParameter>();
@@ -88,15 +114,22 @@ namespace MES.Web
             return parameters.ToArray();
         }
 
-        // 查询按钮点击
+        /// <summary>
+        /// 查询按钮点击事件
+        /// </summary>
         protected void btnQuery_Click(object sender, EventArgs e)
         {
+            // 重置为第一页
             ViewState["CurrentPage"] = 1;
+            // 获取查询条件
             string woNo = txtWorkOrderNo.Text.Trim();
+            // 绑定数据
             BindWorkOrderList(woNo);
         }
 
-        // 导出Excel
+        /// <summary>
+        /// 导出Excel按钮点击事件
+        /// </summary>
         protected void btnExport_Click(object sender, EventArgs e)
         {
             try
@@ -123,9 +156,10 @@ namespace MES.Web
                     return;
                 }
 
-                // 使用EPPlus导出
+                // 使用EPPlus导出Excel
                 using (ExcelPackage package = new ExcelPackage())
                 {
+                    // 添加工作表
                     ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("工单列表");
 
                     // 设置表头
@@ -177,13 +211,18 @@ namespace MES.Web
             }
         }
 
-        // 分页按钮点击事件
+        /// <summary>
+        /// 第一页按钮点击事件
+        /// </summary>
         protected void btnFirst_Click(object sender, EventArgs e)
         {
             ViewState["CurrentPage"] = 1;
             BindWorkOrderList(txtWorkOrderNo.Text.Trim());
         }
 
+        /// <summary>
+        /// 上一页按钮点击事件
+        /// </summary>
         protected void btnPrev_Click(object sender, EventArgs e)
         {
             int currentPage = Convert.ToInt32(ViewState["CurrentPage"]);
@@ -194,6 +233,9 @@ namespace MES.Web
             }
         }
 
+        /// <summary>
+        /// 下一页按钮点击事件
+        /// </summary>
         protected void btnNext_Click(object sender, EventArgs e)
         {
             int currentPage = Convert.ToInt32(ViewState["CurrentPage"]);
@@ -201,6 +243,9 @@ namespace MES.Web
             BindWorkOrderList(txtWorkOrderNo.Text.Trim());
         }
 
+        /// <summary>
+        /// 最后一页按钮点击事件
+        /// </summary>
         protected void btnLast_Click(object sender, EventArgs e)
         {
             // 计算总页数
@@ -221,7 +266,9 @@ namespace MES.Web
             BindWorkOrderList(workOrderNo);
         }
 
-        // 页码输入框事件
+        /// <summary>
+        /// 页码输入框事件
+        /// </summary>
         protected void txtPage_TextChanged(object sender, EventArgs e)
         {
             if (int.TryParse(txtPage.Text, out int page) && page > 0)
@@ -231,4 +278,8 @@ namespace MES.Web
             }
         }
     }
+
+    // 历史记录：
+    // 2026-04-06：初始版本
+    // 后续计划：添加批量操作、工单状态更新等功能
 }
